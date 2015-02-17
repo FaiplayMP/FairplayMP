@@ -1,0 +1,23 @@
+/* 
+ * Alice, Bob and Charlie are player types.
+ * Alice has input and output, Bob only has an input and Charlie only has an output.
+ * alice0, alice1, bob and charlie are the players who participate in the protocol.
+ * alice0 is of type Alice. Her output is 1 if she is richer than bob.
+ * alice1 is of type Alice. Her output is 1 if she is richer than alice0 and than bob.
+ * charlie is of type Charlie. His output is 1 if bob is richer than alice0.
+ */
+program Millionaires{
+  type int = Int<4>;
+
+  type Alice = struct {int input, Boolean output};
+  type Bob = struct {int input};
+  type Charlie = struct {Boolean output};
+
+  function void main (Alice[2] alice, Bob bob, Charlie charlie){
+    alice[0].output = (alice[0].input > bob.input);
+    alice[1].output = (alice[1].input > alice[0].input)
+      && (alice[1].input > bob.input);
+    charlie.output = (bob.input > alice[0].input);
+  }
+}
+
