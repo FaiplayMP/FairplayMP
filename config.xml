@@ -2,7 +2,7 @@
 
 <Fairplay2>	
 	<!--  The circuit file to compute -->
-	<Circuit>SecondPriceAuction.sfdl.cnv</Circuit>
+	<Circuit>SecondPriceAuction-tocompile.sfdl</Circuit>
 
 	<!-- List of IP's of the computers involved in the computation. -->
 	<Participates>

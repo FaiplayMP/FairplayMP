@@ -1,0 +1,84 @@
+<project name="libfpmp" basedir="." default="main">
+<!--configurable stops here-->
+
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build" />
+    <property name="lib.dir"  value="lib"/>
+    <property name="lib_junit.dir"  value="lib_junit"/>
+    <property name="classes.dir" value="${build.dir}/classes" />
+    <property name="jar.dir" value="${build.dir}/jar" />
+    <property name="report.dir"  value="${build.dir}/junitreport"/>
+
+    <path id="classpath.lib">
+        <fileset dir="${lib_junit.dir}" includes="**/*.jar"/> <!--put junit_lib.dir before lib.dir, so that TestCase in lib_junit.dir/*.jar will take predecence of TestCase, if any, in lib.dir. -->
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <pathelement location="${build.dir}" /> <!-- use pathelement to include a dir in classpath -->
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+<!--debu-->
+<!--be aware: when there are too many files in classpath, the <pathconvert> utility may fail saliently, which bring down the whole execution-->
+    <target name="debug-echo-compile-classpath" description="Echo compile classpath">
+        <pathconvert targetos="unix" property="compile.path.unix" refid="classpath.lib"/>
+        <echo message="Class path before compile: ${compile.path.unix}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" debug="on" destdir="${classes.dir}" classpathref="classpath.lib"/> <!--debug should be turned on-->
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+<!--OPT:
+           <zipfileset src="${lib.dir}/libWWW.jar" includes="**/*.java **/*.class"/>  
+pack libWWW.jar into one released/output jar libXXX.jar -->
+        </jar>
+    </target>
+
+
+    <path id="junit.path">
+                <path refid="classpath.lib"/>
+                <path refid="classpath.application"/>
+    </path>
+
+
+<!--debug-->
+    <target name="debug-echo-junit-classpath" description="Echo test classpath">
+        <pathconvert targetos="unix" property="test.path.unix" refid="junit.path"/>
+        <echo message="Class path before JUnit: ${test.path.unix}"/>
+    </target>
+
+    <path id="classpath.application" location="${jar.dir}/${ant.project.name}.jar"/>
+
+    <path id="classpath.test" location=""/>
+    <target name="junit" depends="jar" unless="dont.run.junit">
+<!-- see here: http://stackoverflow.com/questions/374673/does-ant-offer-a-way-to-bypass-dependency-->
+        <junit printsummary="yes" showoutput="yes"> <!--showoutput is used to show standard printout-->
+            <classpath>
+                <path refid="junit.path"/>
+            </classpath>
+            <assertions>
+                <enable/> <!--this is for enabling assertions in all user classes-->
+                <!-- <enable package="org.apache"/> --> <!--this is for enabling assertions in org.apache package, see http://ant.apache.org/manual/Types/assertions.html-->
+            </assertions>
+
+            <formatter type="plain" usefile="false" /> <!--show error information-->
+            <sysproperty key="tt_javaSystemPropertyKey_YYY" value="${tt_antPropertyName_YYY}"/>
+            <batchtest fork="yes">
+                <fileset dir="${src.dir}" includes="test/**/*Test.java"/> <!--any class in (sud)-dir src-->
+<!--this is the right way! package name should be in "includes"!-->
+<!-- 
+                <fileset dir="${src.dir}" includes="*Test.java"/>
+-->
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="debug" depends="clean,debug-echo-compile-classpath,jar,debug-echo-junit-classpath,junit"/>
+    <target name="main" depends="clean,jar,junit"/>
+</project>

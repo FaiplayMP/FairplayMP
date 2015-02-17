@@ -1,0 +1,45 @@
+/** 
+ * Performs a 2nd price auction between 4 bidders.  
+ * At the end only the winning bidder and the seller know the identity of the winner
+ * Everyone knows the 2nd highest price, 
+ * Nothing else is known to anyone.
+ **/
+program SecondPriceAuction{
+  const nBidders = 4;
+  type Bid = Int<4>; // enough bits to represent a small bid.
+  type WinningBidder = Int<3>; // enough bits to represent a winner (nBitters bits).
+  
+  type SellerOutput = struct{WinningBidder winner, Bid winningPrice};
+  type Seller = struct{SellerOutput output}; // Seller has no input
+  
+  type BidderOutput = struct{Boolean win, Bid winningPrice};
+  type Bidder = struct{Bid input, BidderOutput output};
+
+  function void main(Seller seller, Bidder[nBidders] bidder){
+    var Bid high;
+    var Bid second;
+    var WinningBidder winner;
+    winner = 0; high = bidder[0].input; second = 0;
+   
+    // Making the auction. 
+    for(i=1 to nBidders-1){
+      if(bidder[i].input > high){
+        winner = i;
+        second = high;
+        high = bidder[i].input;
+      }
+		else {
+			if(bidder[i].input > second)
+				second = bidder[i].input;
+		}
+    }
+ 
+    // Setting the result.
+    seller.output.winner = winner;
+    seller.output.winningPrice = second;
+    for(i=0 to nBidders-1){
+      bidder[i].output.win = (winner == i);
+      bidder[i].output.winningPrice = second;
+    }
+  }
+}

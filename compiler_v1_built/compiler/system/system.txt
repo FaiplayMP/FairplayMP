@@ -1,0 +1,135 @@
+//System.sfe.
+//Copyright (C) 2004 Naom Nisan, Amichai Zisken.
+//See full copyright license terms in file ../GPL.txt
+
+/*
+	this file holds system functions - mul/div
+	parser links these functions with appropiate
+	symbols
+*/
+program System
+{
+	
+ 	function generic shr (Int<> v) : Int<v.bitSize>
+ 	{
+ 			for (i = 0 to v.bitSize-2)
+	 		{	
+	 			shr[i] = v[i+1];
+	 		}
+	 		shr[v.bitSize-1] = 0;
+ 	}
+ 	
+ 	function generic shl (Int<> v) : Int<v.bitSize>
+ 	{
+ 			for (i = 1 to v.bitSize-1)
+	 		{	
+	 			shl[v.bitSize-i] = v[v.bitSize-i-1];
+	 		}
+	 		shl[0] = 0;
+ 	}
+ 	
+ 	/* returns an enlarged variables filled with zeros */
+ 	function generic resize(Int<> v,Int<> new_size) : Int<new_size>
+	{
+		
+		for (i = 0 to v.bitSize-1)
+	 		{	//print("in resize ",i);
+	 			resize[i] = v[i];
+	 		}
+	 	for (i = v.bitSize to new_size-1)
+	 	{	
+	 		resize[i] = 0;
+	 	}	
+	}
+	
+	
+	 function generic mul (Int<> v0,Int<> v1) : Int<v0.bitSize+v1.bitSize>
+	 {
+		
+	
+		var Boolean flip;
+		var Boolean mult;
+		var Int<v0.bitSize+v1.bitSize> tmp;
+		
+		//	print("im mul");	
+		mult = true;
+		flip = false;
+
+		if (v0<0) 
+		{
+			v0 = -v0;
+			flip = !flip;
+		}
+		
+		
+		if (v1<0)
+		{
+			v1 = -v1;
+			flip = !flip;
+		}
+		
+		//here we resize tmp (in optimization this will shrink)
+		tmp = resize(v1,tmp.bitSize);
+		
+		for (i = 0 to v0.bitSize-1)
+		{
+			if (v0[i] == true) mul = mul+tmp;
+			tmp = shl(tmp);
+		}
+		
+		if (flip) mul = -mul;
+		else mul = mul;
+		
+	} 
+	function generic div (Int<> a,Int<> b) : Int<a.bitSize>
+	{
+		
+		var Boolean flip;
+		var Boolean mult;
+		var Int<a.bitSize> q;
+		var Int<a.bitSize> tmp;
+		var Int<a.bitSize> res;
+	
+		
+		mult = true;
+		flip = false;
+
+		if (a<0) 
+		{
+			a = -a;
+			flip = !flip;
+		}
+		
+		
+		if (b<0)
+		{
+			b = -b;
+			flip = !flip;
+		}
+		
+	
+		for (i = 0 to a.bitSize-1)
+		{
+			res = shl(res);
+			q = shl(q);
+			q[0] = a[a.bitSize-i-1];
+			tmp = q-b;
+			if (tmp >= 0)
+			{
+				res[0] = true;
+				q = tmp;
+			} else
+			{
+				res[0] = false;
+			
+			}
+
+		}
+		
+		if (flip) div = -res;
+		else div = res;
+		
+	} 
+	
+	function void main () {}
+}
