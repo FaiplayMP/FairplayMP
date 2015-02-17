@@ -5,9 +5,9 @@ Reference: [[Readme](http://www.cs.huji.ac.il/project/Fairplay/FairplayMP/Readme
 Prerequisite
 ===
 
-``ant 1.8``
+``ant 1.8``, ``java``
 
-FairplayMP version 1 instruction file.
+FairplayMP instructions 
 ===
 
 Stage 1 - SFDL program:
@@ -16,7 +16,7 @@ Stage 1 - SFDL program:
 1. Write your program in SFDL2.0 language, you can use the SFLD2.0 specification and examples in the project web site. (You can see the SecondPriceAuction.sfdl example in the package).
 2. From inside the compiler directory, compile your program using the command:
 
-```
+```bash
 cp sfdl/SecondPriceAuction.sfdl compiler_v1_built/SecondPriceAuction-tocompile.sfdl
 cd compiler_v1_built/compiler
 java lab.Runner -f ../SecondPriceAuction-tocompile.sfdl
@@ -30,7 +30,7 @@ mv *.Opt.fmt ..
 
 OR
 
-```
+```bash
 java  -cp compiler_v2_built/ sfdl.Compiler sfdl/SecondPriceAuction.sfdl 
 ```
 
@@ -43,6 +43,6 @@ Stage 2 - Running the secure multiparty computation:
 
 2. Deploy the package to each participating computer and run:
 
-```
+```bash
 java -cp runtime/build/classes FairplayMP <randomSeed>
 ```
