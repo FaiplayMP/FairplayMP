@@ -1,0 +1,33 @@
+/**
+ * Performs a voting between two candidates.
+ * At the end all the voters know who won.
+ * Nothing else is known to anyone.
+ **/
+program voting{
+    const nVoters = 5;
+	type VotesCount = Int<4>; // Enough bits to count up to 5 voters.
+
+	// Two candidates (in two's compliment).
+	type Vote = Int<2>;
+	type Voter = struct{Vote input, Vote output};
+
+	function void main(Voter[nVoters] voters){
+		var VotesCount[2] vc;
+		var Vote win;
+		
+		// Making the voting.
+		for(i=0 to nVoters-1){
+			if(voters[i].input == 0)
+				vc[0] = vc[0] + 1;
+			else
+				vc[1] = vc[1] + 1;
+		}
+		
+		if (vc[1] > vc[0])
+			win = 1;
+		
+		// Setting the result.
+		for(i=0 to nVoters-1)
+			voters[i].output = win;
+   }
+}
